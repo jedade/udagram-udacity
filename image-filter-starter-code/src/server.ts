@@ -30,6 +30,21 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   /**************************************************************************** */
 
   //! END @TODO1
+  app.get( "/filteredimage", async ( req, res ) => {
+    let { image_url } = req.query;
+
+    if (!image_url.includes('https://') && !image_url.includes('http://')) {
+      return res.status(400).send({ message: 'Your url is not good format' });
+    } 
+    await filterImageFromURL(image_url).then(response => {
+      res.sendFile(response);
+      res.on('finish', () => deleteLocalFiles([response]));
+    }).catch(err =>{
+      return res.status(422).send({ message: 'Server Could not read your image.'});
+    });
+    
+    
+  });
   
   // Root Endpoint
   // Displays a simple message to the user
